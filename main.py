@@ -25,63 +25,14 @@ class Mode:
         self.output_suffix = output_suffix
 
 
-# Stylesheet constants
-DARK_THEME = """
-    QMainWindow, QWidget {
-        background-color: #2b2b2b;
-        color: #ffffff;
-    }
-    QGroupBox {
-        border: 1px solid #555555;
-        border-radius: 5px;
-        margin-top: 10px;
-        padding-top: 10px;
-        font-weight: bold;
-    }
-    QGroupBox::title {
-        subcontrol-origin: margin;
-        left: 10px;
-        padding: 0 5px;
-    }
-    QLineEdit {
-        background-color: #3c3c3c;
-        color: #ffffff;
-        border: 1px solid #555555;
-        border-radius: 3px;
-        padding: 5px;
-    }
-    QPushButton {
-        background-color: #0d47a1;
-        color: #ffffff;
-        border: none;
-        border-radius: 3px;
-        padding: 8px;
-        font-weight: bold;
-    }
-    QPushButton:hover {
-        background-color: #1565c0;
-    }
-    QPushButton:pressed {
-        background-color: #0a3d91;
-    }
-    QPushButton:disabled {
-        background-color: #555555;
-        color: #888888;
-    }
-    QRadioButton::indicator {
-        width: 18px;
-        height: 18px;
-        border-radius: 9px;
-        border: 2px solid #555555;
-    }
-    QRadioButton::indicator:checked {
-        background-color: #0d47a1;
-        border: 2px solid #0d47a1;
-    }
-    QRadioButton::indicator:hover {
-        border: 2px solid #1565c0;
-    }
-"""
+def load_stylesheet():
+    """Load the QSS stylesheet from a file."""
+    try:
+        with open("style.qss", "r") as f:
+            return f.read()
+    except FileNotFoundError:
+        print("Warning: style.qss not found. Using default styles.")
+        return ""
 
 
 def parse_page_ranges(page_input):
@@ -208,7 +159,7 @@ class PDFPageSelectorApp(QMainWindow):
         self.setWindowTitle("PDF Page Selector")
         self.setMinimumSize(400, 580)
         self.resize(400, 580)
-        self.setStyleSheet(DARK_THEME)
+        self.setStyleSheet(load_stylesheet())
         
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
