@@ -8,8 +8,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QButtonGroup)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
-from PyPDF2 import PdfReader, PdfWriter
-from pdf2image import convert_from_path
+import fitz  # PyMuPDF
 
 
 class Mode:
@@ -121,25 +120,30 @@ def check_overwrite_image_files(output_path, parsed_input):
 
 def trim_pdf(input_path, page_numbers, output_path):
     """Create a new PDF with only the specified pages."""
-    reader = PdfReader(input_path)
-    writer = PdfWriter()
-    total_pages = len(reader.pages)
+    doc = fitz.open(input_path)
+    total_pages = len(doc)
     
     valid_pages = []
     invalid_pages = []
     
     for page_num in page_numbers:
         if 1 <= page_num <= total_pages:
-            writer.add_page(reader.pages[page_num - 1])
             valid_pages.append(page_num)
         else:
             invalid_pages.append(page_num)
     
     if not valid_pages:
+        doc.close()
         raise ValueError("No valid pages to include in the output PDF.")
     
-    with open(output_path, "wb") as f:
-        writer.write(f)
+    # Create new document with selected pages (convert to 0-based indexing)
+    new_doc = fitz.open()
+    for page_num in valid_pages:
+        new_doc.insert_pdf(doc, from_page=page_num - 1, to_page=page_num - 1)
+    
+    new_doc.save(output_path)
+    new_doc.close()
+    doc.close()
     
     message = f"Successfully created PDF with {len(valid_pages)} pages"
     if invalid_pages:
@@ -150,10 +154,11 @@ def trim_pdf(input_path, page_numbers, output_path):
 
 def split_pdf(input_path, chunk_size, output_path):
     """Split a PDF into multiple files with specified chunk size."""
-    reader = PdfReader(input_path)
-    total_pages = len(reader.pages)
+    doc = fitz.open(input_path)
+    total_pages = len(doc)
     
     if chunk_size <= 0:
+        doc.close()
         raise ValueError("Chunk size must be a positive integer.")
     
     # Determine output naming
@@ -165,19 +170,21 @@ def split_pdf(input_path, chunk_size, output_path):
     chunk_num = 1
     
     for start_page in range(0, total_pages, chunk_size):
-        writer = PdfWriter()
         end_page = min(start_page + chunk_size, total_pages)
         
-        for page_idx in range(start_page, end_page):
-            writer.add_page(reader.pages[page_idx])
+        # Create new document for this chunk
+        new_doc = fitz.open()
+        new_doc.insert_pdf(doc, from_page=start_page, to_page=end_page - 1)
         
         # Generate output filename
         output_filename = output_dir / f"{base_name}_part{chunk_num}.pdf"
-        with open(output_filename, "wb") as f:
-            writer.write(f)
+        new_doc.save(str(output_filename))
+        new_doc.close()
         
         created_files.append(str(output_filename))
         chunk_num += 1
+    
+    doc.close()
     
     num_chunks = len(created_files)
     message = f"Successfully split PDF into {num_chunks} file{'s' if num_chunks > 1 else ''}"
@@ -188,8 +195,8 @@ def split_pdf(input_path, chunk_size, output_path):
 
 def convert_to_images(input_path, page_numbers, output_path):
     """Convert specified PDF pages to images."""
-    reader = PdfReader(input_path)
-    total_pages = len(reader.pages)
+    doc = fitz.open(input_path)
+    total_pages = len(doc)
     
     valid_pages = []
     invalid_pages = []
@@ -202,6 +209,7 @@ def convert_to_images(input_path, page_numbers, output_path):
             invalid_pages.append(page_num)
     
     if not valid_pages:
+        doc.close()
         raise ValueError("No valid pages to convert to images.")
     
     # Determine output naming
@@ -214,21 +222,20 @@ def convert_to_images(input_path, page_numbers, output_path):
     
     created_files = []
     
-    # Convert pages to images
-    # pdf2image uses 1-based indexing, matching our page_numbers
-    images = convert_from_path(input_path, first_page=min(valid_pages), 
-                               last_page=max(valid_pages))
-    
+    # Convert pages to images using PyMuPDF
     for page_num in valid_pages:
-        # Get the corresponding image from the converted range
-        image_index = page_num - min(valid_pages)
-        if image_index < len(images):
-            image = images[image_index]
-            
-            # Generate output filename
-            output_filename = output_dir / f"{base_name}_page{page_num}.png"
-            image.save(str(output_filename), "PNG")
-            created_files.append(str(output_filename))
+        # Convert to 0-based index
+        page = doc.load_page(page_num - 1)
+        
+        # Render page to an image (pixmap)
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))  # 2x scaling for better quality
+        
+        # Generate output filename
+        output_filename = output_dir / f"{base_name}_page{page_num}.png"
+        pix.save(str(output_filename))
+        created_files.append(str(output_filename))
+    
+    doc.close()
     
     num_images = len(created_files)
     message = f"Successfully converted {num_images} page{'s' if num_images > 1 else ''} to image{'s' if num_images > 1 else ''}"
@@ -455,8 +462,9 @@ class PDFPageSelectorApp(QMainWindow):
             return
         
         try:
-            reader = PdfReader(filename)
-            total_pages = len(reader.pages)
+            doc = fitz.open(filename)
+            total_pages = len(doc)
+            doc.close()
             
             self.input_path = filename
             self._update_label(self.input_label, filename, active=True)
