@@ -31,7 +31,7 @@ jobs:
     
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --windowed --name "PDF-Page-Selector" --add-data "style.qss;." main.py
+        pyinstaller --onefile --windowed --name "ChiselPDF" --add-data "style.qss;." main.py
     
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
@@ -50,7 +50,7 @@ jobs:
     
     - name: Package with Velopack
       run: |
-        vpk pack --packId ChiselPDF --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist --mainExe PDF-Page-Selector.exe
+        vpk pack --packId ChiselPDF --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist --mainExe ChiselPDF.exe
     
     - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v1

@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pdf-page-selector"
+name = "ChiselPDF"
 version = "1.0.0"
 description = "A simple desktop application for working with PDF files"
 readme = "README.md"
@@ -37,6 +37,6 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/kelltom/pdf-page-selector"
-Repository = "https://github.com/kelltom/pdf-page-selector.git"
-Issues = "https://github.com/kelltom/pdf-page-selector/issues"
+Homepage = "https://github.com/kelltom/ChiselPDF"
+Repository = "https://github.com/kelltom/ChiselPDF.git"
+Issues = "https://github.com/kelltom/ChiselPDF/issues"

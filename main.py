@@ -250,7 +250,7 @@ def update_app():
     try:
         # Check for updates from GitHub releases
         # GitHub Actions will upload release files to the latest release
-        manager = velopack.UpdateManager("https://github.com/kelltom/pdf-page-selector/releases/latest/download/")
+        manager = velopack.UpdateManager("https://github.com/kelltom/ChiselPDF/releases/latest/download/")
         update_info = manager.check_for_updates()
         
         if not update_info:

@@ -7,8 +7,8 @@ A simple desktop application for working with PDF files. ChiselPDF allows you to
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/kelltom/pdf-page-selector.git
-cd pdf-page-selector
+git clone https://github.com/kelltom/ChiselPDF.git
+cd ChiselPDF
 ```
 
 ### Set Up Virtual Environment
