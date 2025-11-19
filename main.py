@@ -73,8 +73,8 @@ def parse_chunk_size(chunk_input):
         if chunk_size <= 0:
             raise ValueError("Chunk size must be a positive integer.")
         return chunk_size
-    except ValueError:
-        raise ValueError("Chunk size must be a positive integer.")
+    except ValueError as e:
+        raise ValueError("Chunk size must be a positive integer.") from e
 
 
 def check_overwrite_single_file(output_path, parsed_input=None):
@@ -157,40 +157,36 @@ def split_pdf(input_path, chunk_size, output_path):
     """Split a PDF into multiple files with specified chunk size."""
     doc = fitz.open(input_path)
     total_pages = len(doc)
-    
+
     if chunk_size <= 0:
         doc.close()
         raise ValueError("Chunk size must be a positive integer.")
-    
+
     # Determine output naming
     output_file = Path(output_path)
     base_name = output_file.stem
     output_dir = output_file.parent
-    
+
     created_files = []
-    chunk_num = 1
-    
-    for start_page in range(0, total_pages, chunk_size):
+    for chunk_num, start_page in enumerate(range(0, total_pages, chunk_size), start=1):
         end_page = min(start_page + chunk_size, total_pages)
-        
+
         # Create new document for this chunk
         new_doc = fitz.open()
         new_doc.insert_pdf(doc, from_page=start_page, to_page=end_page - 1)
-        
+
         # Generate output filename
         output_filename = output_dir / f"{base_name}_part{chunk_num}.pdf"
         new_doc.save(str(output_filename))
         new_doc.close()
-        
+
         created_files.append(str(output_filename))
-        chunk_num += 1
-    
     doc.close()
-    
+
     num_chunks = len(created_files)
     message = f"Successfully split PDF into {num_chunks} file{'s' if num_chunks > 1 else ''}"
     message += f"\n\nCreated {num_chunks} PDF{'s' if num_chunks > 1 else ''} in:\n{output_dir}"
-    
+
     return message
 
 
@@ -478,7 +474,7 @@ class PDFPageSelectorApp(QMainWindow):
     
     def _update_label(self, label, text, active=False):
         """Update a label with truncated text and appropriate styling."""
-        display_text = text if len(text) < 80 else "..." + text[-77:]
+        display_text = text if len(text) < 80 else f"...{text[-77:]}"
         label.setText(display_text)
         color = "#ffffff" if active else "#888888"
         label.setStyleSheet(f"color: {color}; padding: 5px;")
@@ -549,30 +545,30 @@ class PDFPageSelectorApp(QMainWindow):
             input_type = self.current_mode.section_title.lower()
             QMessageBox.warning(self, "Error", f"Please enter {input_type}.")
             return
-        
+
         self.status_label.setText("Processing...")
         self.status_label.setStyleSheet("color: #aaaaaa;")
         QApplication.processEvents()
-        
+
         try:
             # Validate output path
             self._ensure_output_path()
-            
+
             # Parse/validate input using mode-specific parser
             try:
                 parsed_input = self.current_mode.parse_input_func(page_input)
             except (ValueError, AttributeError) as e:
-                raise ValueError(f"Invalid input:\n{str(e)}")
-            
+                raise ValueError(f"Invalid input:\n{str(e)}") from e
+
             # Check for file overwrites using mode-specific checker
             if self.current_mode.check_overwrite_func(self.output_path, parsed_input):
                 if not self._confirm_overwrite():
                     return
-            
+
             # Execute the core PDF manipulation function
             message = self.current_mode.core_func(self.input_path, parsed_input, self.output_path)
             self._show_success(message)
-            
+
         except Exception as e:
             self.status_label.setText("Failed")
             self.status_label.setStyleSheet("color: #f44336;")
