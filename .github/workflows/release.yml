@@ -61,5 +61,6 @@ jobs:
         prerelease: false
         files: |
           Releases/*-Setup.exe
+          Releases/*-Portable.zip
           Releases/RELEASES
           Releases/*.nupkg
