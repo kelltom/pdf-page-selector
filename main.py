@@ -249,8 +249,8 @@ def update_app():
     """Check for updates and apply them if available."""
     try:
         # Check for updates from GitHub releases
-        # GitHub Actions will upload release files to the latest release
-        manager = velopack.UpdateManager("https://github.com/kelltom/ChiselPDF")
+        # Point to the latest release download URL
+        manager = velopack.UpdateManager("https://github.com/kelltom/ChiselPDF/releases/latest/download/releases.win.json")
         update_info = manager.check_for_updates()
         
         if not update_info:
