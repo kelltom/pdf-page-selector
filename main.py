@@ -329,7 +329,7 @@ class PDFPageSelectorApp(QMainWindow):
         self.init_ui()
         
     def init_ui(self):
-        self.setWindowTitle("PDF Page Selector")
+        self.setWindowTitle("ChiselPDF")
         self.setMinimumSize(400, 580)
         self.resize(400, 580)
         self.setStyleSheet(load_stylesheet())
@@ -344,7 +344,7 @@ class PDFPageSelectorApp(QMainWindow):
         layout.setSpacing(15)
         
         # Title
-        title = QLabel("PDF Page Selector")
+        title = QLabel("ChiselPDF")
         title.setFont(QFont("", 18, QFont.Weight.Bold))
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)

@@ -50,7 +50,7 @@ jobs:
     
     - name: Package with Velopack
       run: |
-        vpk pack --packId kelltom.pdfpageselector --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist --mainExe PDF-Page-Selector.exe
+        vpk pack --packId ChiselPDF --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist --mainExe PDF-Page-Selector.exe
     
     - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v1
