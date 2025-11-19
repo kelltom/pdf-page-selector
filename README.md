@@ -1,6 +1,6 @@
-# PDF Page Selector
+# ChiselPDF
 
-A simple desktop application for working with PDF files. PDF Page Selector allows you to extract specific pages from a PDF document by specifying page ranges (e.g., 1-3,5,7-10), or split a large PDF into smaller chunks of a specified size. The application features a clean, dark-themed interface built with PyQt6 and supports batch page selection with an intuitive range syntax.
+A simple desktop application for working with PDF files. ChiselPDF allows you to extract specific pages from a PDF document by specifying page ranges (e.g., 1-3,5,7-10), or split a large PDF into smaller chunks of a specified size. The application features a clean, dark-themed interface built with PyQt6 and supports batch page selection with an intuitive range syntax.
 
 ## Getting Started
 
@@ -42,7 +42,7 @@ python main.py
 ### Windows
 
 ```powershell
-pyinstaller --onefile --windowed --name "PDF-Page-Selector" --add-data "style.qss;." main.py
+pyinstaller --onefile --windowed --name "ChiselPDF" --add-data "style.qss;." main.py
 ```
 
 The executable will be created in the `dist` folder.
@@ -50,7 +50,7 @@ The executable will be created in the `dist` folder.
 ### macOS
 
 ```bash
-pyinstaller --onefile --windowed --name "PDF-Page-Selector" --add-data "style.qss:." main.py
+pyinstaller --onefile --windowed --name "ChiselPDF" --add-data "style.qss:." main.py
 ```
 
 The application bundle will be created in the `dist` folder.
