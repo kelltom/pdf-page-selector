@@ -31,7 +31,7 @@ jobs:
     
     - name: Build with PyInstaller
       run: |
-        pyinstaller --onefile --windowed --name "ChiselPDF" --add-data "style.qss;." main.py
+        pyinstaller --onedir --windowed --name "ChiselPDF" --add-data "style.qss;." main.py
     
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
@@ -49,5 +49,5 @@ jobs:
       run: |
         dotnet tool install -g vpk
         vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }}
-        vpk pack --packId ChiselPDF --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist --mainExe ChiselPDF.exe
+        vpk pack --packId ChiselPDF --packVersion ${{ steps.version.outputs.VERSION }} --packDir .\dist\ChiselPDF --mainExe ChiselPDF.exe
         vpk upload github --repoUrl https://github.com/${{ github.repository }} --publish --releaseName "ChiselPDF ${{ steps.version.outputs.VERSION }}" --tag v${{ steps.version.outputs.VERSION }} --token ${{ secrets.GITHUB_TOKEN }}
