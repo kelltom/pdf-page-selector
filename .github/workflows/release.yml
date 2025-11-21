@@ -7,6 +7,10 @@ on:
     tags:
       - 'v*'
 
+env:
+  MAJOR_VERSION: 1
+  MINOR_VERSION: 0
+
 jobs:
   build-and-release:
     runs-on: windows-latest
@@ -41,7 +45,7 @@ jobs:
     - name: Generate version number
       id: version
       run: |
-        $version = "1.0.${{ github.run_number }}"
+        $version = "${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}"
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
         echo "Version: $version"
     
@@ -50,8 +54,8 @@ jobs:
         @"
         VSVersionInfo(
           ffi=FixedFileInfo(
-            filevers=(1, 0, ${{ github.run_number }}, 0),
-            prodvers=(1, 0, ${{ github.run_number }}, 0),
+            filevers=(${{ env.MAJOR_VERSION }}, ${{ env.MINOR_VERSION }}, ${{ github.run_number }}, 0),
+            prodvers=(${{ env.MAJOR_VERSION }}, ${{ env.MINOR_VERSION }}, ${{ github.run_number }}, 0),
             mask=0x3f,
             flags=0x0,
             OS=0x40004,
@@ -65,12 +69,12 @@ jobs:
                 u'040904B0',
                 [StringStruct(u'CompanyName', u'kelltom'),
                 StringStruct(u'FileDescription', u'ChiselPDF - PDF Page Selector'),
-                StringStruct(u'FileVersion', u'1.0.${{ github.run_number }}.0'),
+                StringStruct(u'FileVersion', u'${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}.0'),
                 StringStruct(u'InternalName', u'ChiselPDF'),
                 StringStruct(u'LegalCopyright', u'Copyright (c) 2025 kelltom'),
                 StringStruct(u'OriginalFilename', u'ChiselPDF.exe'),
                 StringStruct(u'ProductName', u'ChiselPDF'),
-                StringStruct(u'ProductVersion', u'1.0.${{ github.run_number }}.0')])
+                StringStruct(u'ProductVersion', u'${{ env.MAJOR_VERSION }}.${{ env.MINOR_VERSION }}.${{ github.run_number }}.0')])
             ]),
             VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
           ]
