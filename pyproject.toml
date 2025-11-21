@@ -28,10 +28,6 @@ dependencies = [
     "PyQt6>=6.10.0",
     "PyMuPDF>=1.25.2",
     "darkdetect>=0.8.0",
-]
-
-[project.optional-dependencies]
-dev = [
     "pyinstaller>=6.16.0",
     "velopack>=0.0.1369.dev7516",
 ]
