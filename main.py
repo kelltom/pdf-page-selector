@@ -498,6 +498,26 @@ class PDFPageSelectorApp(QMainWindow):
         
         self._update_label(self.output_label, self.output_path, active=True)
     
+    def _get_pdf_page_count(self, filename):
+        """Get the total number of pages in a PDF file."""
+        doc = fitz.open(filename)
+        total_pages = len(doc)
+        doc.close()
+        return total_pages
+    
+    def _load_input_pdf(self, filename):
+        """Load input PDF and update UI with file information."""
+        total_pages = self._get_pdf_page_count(filename)
+        
+        self.input_path = filename
+        self._update_label(self.input_label, filename, active=True)
+        self.page_info_label.setText(f"Total pages: {total_pages}")
+        
+        # Auto-suggest output path
+        self._update_output_suggestion()
+        
+        self.process_button.setEnabled(True)
+    
     def browse_input(self):
         filename, _ = QFileDialog.getOpenFileName(
             self, "Select Input PDF", "", "PDF files (*.pdf);;All files (*.*)"
@@ -507,18 +527,7 @@ class PDFPageSelectorApp(QMainWindow):
             return
         
         try:
-            doc = fitz.open(filename)
-            total_pages = len(doc)
-            doc.close()
-            
-            self.input_path = filename
-            self._update_label(self.input_label, filename, active=True)
-            self.page_info_label.setText(f"Total pages: {total_pages}")
-            
-            # Auto-suggest output path
-            self._update_output_suggestion()
-            
-            self.process_button.setEnabled(True)
+            self._load_input_pdf(filename)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Could not read PDF: {str(e)}")
             self.input_path = None
@@ -563,9 +572,8 @@ class PDFPageSelectorApp(QMainWindow):
                 raise ValueError(f"Invalid input:\n{str(e)}") from e
 
             # Check for file overwrites using mode-specific checker
-            if self.current_mode.check_overwrite_func(self.output_path, parsed_input):
-                if not self._confirm_overwrite():
-                    return
+            if self.current_mode.check_overwrite_func(self.output_path, parsed_input) and not self._confirm_overwrite():
+                return
 
             # Execute the core PDF manipulation function
             message = self.current_mode.core_func(self.input_path, parsed_input, self.output_path)
